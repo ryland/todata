@@ -1,0 +1,22 @@
+Todata
+======
+
+Today's google analytics info in your console. For the obsessed.
+
+Todata has one purpose only: to grab interesting stats from a google analytics
+profile and dump them to your console in a (somewhat) pretty format.
+
+### Configuration ###
+
+Create a file named `.todatarc` with the following in your home directory:
+
+    profile_id: 1234567
+    email: youraccount@gmail.com
+    password: secret
+
+Add your own information and make sure to `chmod 600 ~/.todatarc`.
+
+
+### Info ###
+
+http://github.com/ryland/todata/tree/master
