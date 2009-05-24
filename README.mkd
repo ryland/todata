@@ -19,4 +19,9 @@ Add your own information and make sure to `chmod 600 ~/.todatarc`.
 
 ### Info ###
 
-http://github.com/ryland/todata/tree/master
+Requires the [gattica gem][1].
+
+Most recent code is available at [github][2]. 
+
+[1]: http://github.com/cannikin/gattica/tree/master
+[2]: http://github.com/ryland/todata/tree/master
