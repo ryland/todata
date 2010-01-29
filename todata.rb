@@ -23,6 +23,7 @@ class String
     def dark_green; colorize(self, "\e[32m"); end
     def yellow; colorize(self, "\e[1m\e[33m"); end
     def blue; colorize(self, "\e[1m\e[34m"); end
+    def dark_blue; colorize(self, "\e[34m"); end
 end
 
 module Todata
@@ -35,7 +36,7 @@ Pageviews:  <%= @metrics[:pageviews].to_s.red.bold %>
 ----------------------------------------------------------------------
 Top Referrers:
   <% @metrics[:referrers].each_with_index do |r,i| %>
-  <%= (String(i+1)<<".").rjust(3) %> <%= (r[:source]+r[:referralPath]).green.bold %> (<%= r[:pageviews].to_s.blue %>)<% end %>
+  <%= (String(i+1)<<".").rjust(3) %> <%= (r[:source]+r[:referralPath]).green.bold %> (<%= r[:visits].to_s.blue+"/"+r[:pageviews].to_s.dark_blue %>)<% end %>
 ----------------------------------------------------------------------
 END
   class DataBinding
@@ -65,12 +66,14 @@ END
     metric_fields = %w(pageviews visits)
     today_opts = {:start_date => today, :end_date => today }
     stat_query= g.get(today_opts.merge(:metrics => metric_fields, :sort => ['-pageviews']))
-    ref_query = g.get(today_opts.merge(:metrics => ['pageviews'], :dimensions => ['referralPath', 'source'], :sort => ['-pageviews']))
+    ref_query = g.get(today_opts.merge(:metrics => metric_fields, :dimensions => ['referralPath', 'source'], :sort => ['-visits']))
 
     metric_fields.each_with_index do |m,i|
       metrics[m.to_sym] = stat_query.points.first.metrics[i][m.to_sym]
     end
-    metrics[:referrers] = ref_query.points[0...15].collect{|r| r.dimensions.first.merge(r.dimensions.last.merge(:pageviews => r.metrics.first[:pageviews]))}
+    metrics[:referrers] = ref_query.points[0...15].collect do |r| 
+      r.dimensions.first.merge(r.dimensions.last.merge(r.metrics.inject({}){|h,m| h.merge(m)}))
+    end
     puts ERB.new(@config.include?('template') ? @config['template'] : DEFAULT_TEMPLATE).result(DataBinding.new(today, metrics).get_binding)
   end
 end
